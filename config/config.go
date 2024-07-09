@@ -12,12 +12,17 @@ type Config struct {
 	AppSecret string
 }
 
+type ApexConfig struct {
+	AuthKey string `yaml:"auth_key"`
+}
+
 type MarvinConfig struct {
-	Marvin Config `json:"marvin"`
+	Marvin Config     `yaml:"marvin"`
+	Apex   ApexConfig `yaml:"apex"`
 }
 
 // LoadConfig reads the configuration from a YAML file
-func LoadConfig(filename string) (*Config, error) {
+func LoadConfig(filename string) (*MarvinConfig, error) {
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
@@ -29,5 +34,5 @@ func LoadConfig(filename string) (*Config, error) {
 		return nil, err
 	}
 
-	return &cfg.Marvin, nil
+	return &cfg, nil
 }
