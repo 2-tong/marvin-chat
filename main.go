@@ -18,7 +18,8 @@ import (
 )
 
 var botApi openapi.OpenAPI = nil
-var apexApi = api.ApexApi{}
+var apexApi *api.ApexApi = nil
+var shortApi *api.ShortApi = nil
 
 func main() {
 	conf, err := config.LoadConfig("./marvin.yml")
@@ -26,8 +27,9 @@ func main() {
 		log.Fatal(err)
 	}
 	ctx := context.Background()
-	apexApi = api.ApexApi{}
+	apexApi = &api.ApexApi{}
 	apexApi.Setup(&conf.Apex)
+	shortApi = api.NewShortApi(conf.ShortKey)
 
 	botToken := token.BotToken(conf.Marvin.AppID, conf.Marvin.Token)
 	botApi = botgo.NewSandboxOpenAPI(botToken).WithTimeout(3 * time.Second) // 使用NewSandboxOpenAPI创建沙箱环境的实例
@@ -85,7 +87,36 @@ func handleStrContent(msg string) string {
 		status, _ := apexApi.GetApexMapStatus(context.Background())
 		return apexMapToString(status)
 	}
-	return "未知命令"
+	if strings.Contains(msg, "新闻") || strings.Contains(msg, "咨询") {
+		return handleNews()
+	}
+	return "听不懂思密达😅"
+}
+
+func handleNews() string {
+	newTmp := `标题：{{.Title}}
+内容：{{.ShortDesc}}
+{{.Link}}`
+
+	news, err := apexApi.GetApexNews(context.Background())
+	if err != nil {
+		return "发送内部错误"
+	}
+	topNews := news[0]
+	topNews.Link, err = shortApi.GetLink(context.Background(), topNews.Link)
+	if err != nil {
+		return "发送内部错误"
+	}
+	tmpl, err := template.New("newTmp").Parse(newTmp)
+	if err != nil {
+		return "发送内部错误"
+	}
+	var buf bytes.Buffer
+	err = tmpl.Execute(&buf, topNews)
+	if err != nil {
+		return ""
+	}
+	return buf.String()
 }
 
 func replyGroup(origin *dto.Message) {

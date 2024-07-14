@@ -16,6 +16,8 @@ const (
 
 	mapURI      = "/maprotation?version=2"
 	mapCacheKey = "mapInfo"
+
+	news = "/news?lang=zh_TW"
 )
 
 type apexMapRequest struct {
@@ -144,4 +146,29 @@ type GameMode struct {
 type ApexStatus struct {
 	BattleRoyale GameMode `json:"battle_royale"`
 	Ranked       GameMode `json:"ranked"`
+}
+
+type ApexNews struct {
+	Title     string `json:"title"`
+	Link      string `json:"link"`
+	Img       string `json:"img"`
+	ShortDesc string `json:"short_desc"`
+}
+
+// GetApexNews  获取apex地图
+func (o *ApexApi) GetApexNews(ctx context.Context) ([]ApexNews, error) {
+
+	resp, err := o.request(ctx).
+		Get(address + news)
+	if err != nil {
+		return nil, err
+	}
+	var res []ApexNews
+
+	err = json.Unmarshal(resp.Body(), &res)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }
