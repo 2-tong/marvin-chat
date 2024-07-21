@@ -3,6 +3,7 @@ package handler
 import (
 	"bytes"
 	"context"
+	"github.com/tencent-connect/botgo/log"
 	"marvin-chat/api"
 	"marvin-chat/config"
 	"text/template"
@@ -23,34 +24,45 @@ var mapTmp, _ = template.New("mapTmp").Parse(
 var newsTmp, _ = template.New("newsTmp").Parse(
 	`标题:{{.Title}}
 简讯:{{.ShortDesc}}
-https://marvin.a2tong.com/news/123`)
+{{.Link}}`)
 
 var apexApi = api.ApexApi{}
 
 func SetUpApex(conf *config.MarvinConfig) {
 	apexApi = api.ApexApi{}
-	apexApi.Setup(&conf.Apex)
+	apexApi.Setup(conf)
 }
 
-func ApexMapQuery() string {
+func ApexMapQuery(_ string) string {
 	status, _ := apexApi.GetApexMapStatus(context.Background())
 	var buf bytes.Buffer
 	err := mapTmp.Execute(&buf, status)
 	if err != nil {
+		log.Error(err)
 		return ""
 	}
 	return buf.String()
 }
 
-func ApexNewsQuery() (string, error) {
+func ApexNewsQuery(_ string) string {
 	apexNews, err := apexApi.GetApexNews(context.Background())
 	if err != nil {
-		return "", err
+		log.Error(err)
+		return ""
 	}
+	news := apexNews[0]
+	news.Link, _ = apexApi.GetLink(context.Background(), news.Link)
 	var buf bytes.Buffer
-	err = newsTmp.Execute(&buf, apexNews[0])
+	err = newsTmp.Execute(&buf, news)
 	if err != nil {
-		return "", err
+		log.Error(err)
+		return ""
 	}
-	return buf.String(), nil
+	return buf.String()
+}
+
+func init() {
+	RegisterSimpleMsgHandler("地图", ApexMapQuery)
+	RegisterSimpleMsgHandler("新闻", ApexNewsQuery)
+	RegisterSimpleMsgHandler("资讯", ApexNewsQuery)
 }

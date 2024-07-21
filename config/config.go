@@ -17,8 +17,9 @@ type ApexConfig struct {
 }
 
 type MarvinConfig struct {
-	Marvin Config     `yaml:"marvin"`
-	Apex   ApexConfig `yaml:"apex"`
+	Marvin   Config     `yaml:"marvin"`
+	Apex     ApexConfig `yaml:"apex"`
+	ShortKey string     `yaml:"short_key"`
 }
 
 // LoadConfig reads the configuration from a YAML file

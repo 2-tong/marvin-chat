@@ -11,7 +11,6 @@ import (
 	"log"
 	"marvin-chat/config"
 	"marvin-chat/handler"
-	"strings"
 	"time"
 )
 
@@ -36,45 +35,33 @@ func main() {
 }
 
 func replyC2C(origin *dto.Message) {
-
-	replayContent := handleStrContent(origin.Content)
-
-	reMsg := dto.MessageToCreate{
-		MsgID:   origin.ID,
-		EventID: string(dto.EventC2CMessageCreate),
-		MsgType: 0,
-		Content: replayContent,
-	}
-	_, err := botApi.PostC2CMessage(context.Background(), origin.Author.UserOpenid, &reMsg)
-	if err != nil {
-		return
-	}
-}
-
-func handleStrContent(msg string) string {
-	if strings.Contains(msg, "地图") {
-		return handler.ApexMapQuery()
-	}
-	if strings.Contains(msg, "资讯") || strings.Contains(msg, "新闻") {
-		query, _ := handler.ApexNewsQuery()
-		return query
-	}
-	return "未知命令"
+	handler.HandleTextMsg(origin.Content, func(reply string) {
+		reMsg := dto.MessageToCreate{
+			MsgID:   origin.ID,
+			EventID: string(dto.EventC2CMessageCreate),
+			MsgType: 0,
+			Content: reply,
+		}
+		_, err := botApi.PostC2CMessage(context.Background(), origin.Author.UserOpenid, &reMsg)
+		if err != nil {
+			return
+		}
+	})
 }
 
 func replyGroup(origin *dto.Message) {
-	replayContent := handleStrContent(origin.Content)
-
-	reMsg := dto.MessageToCreate{
-		MsgID:   origin.ID,
-		EventID: string(dto.EventGroupAtMessageCreate),
-		MsgType: 0,
-		Content: "\n" + replayContent,
-	}
-	_, err := botApi.PostGroupMessage(context.Background(), origin.GroupOpenid, &reMsg)
-	if err != nil {
-		return
-	}
+	handler.HandleTextMsg(origin.Content, func(reply string) {
+		reMsg := dto.MessageToCreate{
+			MsgID:   origin.ID,
+			EventID: string(dto.EventGroupAtMessageCreate),
+			MsgType: 0,
+			Content: "\n" + reply,
+		}
+		_, err := botApi.PostGroupMessage(context.Background(), origin.GroupOpenid, &reMsg)
+		if err != nil {
+			return
+		}
+	})
 }
 
 func onPrivateMessageIn() event.C2CMessageEventHandler {

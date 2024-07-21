@@ -25,6 +25,7 @@ type ApexNews struct {
 }
 
 type ApexApi struct {
+	ShortApi
 	resCache    *cache.TimeOutCache
 	authKey     string
 	restyClient *resty.Client // resty client 复用

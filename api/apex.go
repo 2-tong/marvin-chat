@@ -20,10 +20,15 @@ const (
 )
 
 // Setup 生成一个实例
-func (o *ApexApi) Setup(apexCfg *config.ApexConfig) *ApexApi {
-	o.authKey = apexCfg.AuthKey
+func (o *ApexApi) Setup(apexCfg *config.MarvinConfig) *ApexApi {
+	o.authKey = apexCfg.Apex.AuthKey
 	o.resCache = cache.NewCache()
+	o.apikey = apexCfg.ShortKey
 	o.setupClient() // 初始化可复用的 client
+	o.client = resty.New().
+		SetLogger(log.DefaultLogger).
+		SetDebug(true).
+		SetTimeout(3 * time.Second)
 	return o
 }
 
@@ -36,7 +41,6 @@ func (o *ApexApi) request(ctx context.Context) *resty.Request {
 func (o *ApexApi) setupClient() {
 	o.restyClient = resty.New().
 		SetLogger(log.DefaultLogger).
-		SetDebug(true).
 		SetTimeout(3*time.Second).
 		SetHeader("Authorization", o.authKey)
 	//SetHeader("User-Agent", version.String()).
