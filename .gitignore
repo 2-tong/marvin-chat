@@ -1,1 +1,7 @@
 /marvin.yml
+/.idea/.gitignore
+/build_linux_linux
+/marvin-chat.exe
+/.idea/marvin-chat.iml
+/.idea/modules.xml
+/.idea/vcs.xml

@@ -17,10 +17,7 @@ import (
 var botApi openapi.OpenAPI = nil
 
 func main() {
-	conf, err := config.LoadConfig("./marvin.yml")
-	if err != nil {
-		log.Fatal(err)
-	}
+	conf := config.GetConfig()
 	ctx := context.Background()
 	handler.SetUpApex(conf)
 	botToken := token.BotToken(conf.Marvin.AppID, conf.Marvin.Token)
@@ -29,6 +26,7 @@ func main() {
 	ws, _ := botApi.WS(ctx, nil, "")
 	intent := websocket.RegisterHandlers(onGroupMessageIn(), onPrivateMessageIn())
 	// 指定需要启动的分片数为 2 的话可以手动修改 wsInfo
+	var err error = nil
 	if err = botgo.NewSessionManager().Start(ws, botToken, &intent); err != nil {
 		log.Fatalln(err)
 	}

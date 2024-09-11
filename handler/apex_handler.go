@@ -34,9 +34,13 @@ func SetUpApex(conf *config.MarvinConfig) {
 }
 
 func ApexMapQuery(_ string) string {
-	status, _ := apexApi.GetApexMapStatus(context.Background())
+	status, err := apexApi.GetApexMapStatus(context.Background())
+	if err != nil {
+		log.Error(err)
+		return ""
+	}
 	var buf bytes.Buffer
-	err := mapTmp.Execute(&buf, status)
+	err = mapTmp.Execute(&buf, status)
 	if err != nil {
 		log.Error(err)
 		return ""

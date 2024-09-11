@@ -62,6 +62,8 @@ func (a *ApexMapInfo) ChineseName() string {
 		return "世界尽头"
 	case "Storm Point":
 		return "风暴点"
+	case "E-District":
+		return "电流区"
 	default:
 		return a.Map
 	}

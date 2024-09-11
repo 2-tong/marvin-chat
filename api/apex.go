@@ -65,9 +65,9 @@ func (o *ApexApi) GetApexMapStatus(ctx context.Context) (*ApexStatus, error) {
 		return nil, err
 	}
 
+	//计算最靠前的地图更新时间
 	minTime := res.BattleRoyale.Current.End
 	rkT := res.Ranked.Current.End
-
 	if minTime > rkT {
 		minTime = rkT
 	}
