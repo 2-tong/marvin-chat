@@ -3,11 +3,12 @@ package api
 import (
 	"context"
 	"encoding/json"
-	"github.com/go-resty/resty/v2"
-	"github.com/tencent-connect/botgo/log"
 	"marvin-chat/cache"
 	"marvin-chat/config"
 	"time"
+
+	"github.com/go-resty/resty/v2"
+	"github.com/tencent-connect/botgo/log"
 )
 
 const (
@@ -73,7 +74,7 @@ func (o *ApexApi) GetApexMapStatus(ctx context.Context) (*ApexStatus, error) {
 	}
 
 	utcTime := time.Unix(minTime, 0)
-
+	res.ExpireT = utcTime.UnixMilli()
 	o.resCache.Set(mapCacheKey, &res, utcTime)
 	return &res, nil
 }

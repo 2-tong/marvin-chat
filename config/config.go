@@ -1,16 +1,17 @@
 package config
 
 import (
+	"os"
+
 	"github.com/go-redis/redis/v8"
 	"gopkg.in/yaml.v3"
-	"os"
 )
 
 // QbotConfig represents the configuration structure
 type QbotConfig struct {
-	AppID     uint64 `yaml:"app_id"`
+	AppID     string `yaml:"app_id"`
 	Token     string `yaml:"token"`
-	AppSecret string
+	AppSecret string `yaml:"secret"`
 }
 
 type ApexConfig struct {
@@ -18,10 +19,13 @@ type ApexConfig struct {
 }
 
 type MarvinConfig struct {
-	Marvin   QbotConfig    `yaml:"marvin"`
-	Apex     ApexConfig    `yaml:"apex"`
-	ShortKey string        `yaml:"short_key"`
-	Redis    redis.Options `yaml:"redis"`
+	Marvin       QbotConfig    `yaml:"marvin"`
+	Apex         ApexConfig    `yaml:"apex"`
+	ShortKey     string        `yaml:"short_key"`
+	Redis        redis.Options `yaml:"redis"`
+	MapHtml      string        `yaml:"map_html"`
+	ImgPath      string        `yaml:"img_path"`
+	ImgUrlPrefix string        `yaml:"img_url_prefix"`
 }
 
 var config *MarvinConfig = nil

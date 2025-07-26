@@ -5,3 +5,5 @@
 /.idea/marvin-chat.iml
 /.idea/modules.xml
 /.idea/vcs.xml
+.vscode/settings.json
+chat_marvin_linux_x64

@@ -2,9 +2,10 @@ package api
 
 import (
 	"fmt"
-	"github.com/go-resty/resty/v2"
 	"marvin-chat/cache"
 	"time"
+
+	"github.com/go-resty/resty/v2"
 )
 
 type GameMode struct {
@@ -15,6 +16,7 @@ type GameMode struct {
 type ApexStatus struct {
 	BattleRoyale GameMode `json:"battle_royale"`
 	Ranked       GameMode `json:"ranked"`
+	ExpireT      int64
 }
 
 type ApexNews struct {
@@ -44,6 +46,10 @@ type ApexMapInfo struct {
 	RemainingSecs     int    `json:"remainingSecs,omitempty"`
 	RemainingMins     int    `json:"remainingMins,omitempty"`
 	RemainingTimer    string `json:"remainingTimer,omitempty"`
+}
+
+func (a *ApexMapInfo) FixedStartTimeStr() string {
+	return fixTime(a.Start)
 }
 
 func (a *ApexMapInfo) FixedEndTimeStr() string {
@@ -82,6 +88,6 @@ func fixTime(t64 int64) string {
 	// 将UTC时间转换到目标时区
 	targetTime := utcTime.In(targetLocation)
 
-	customFormat := "01-02 15:04"
+	customFormat := "15:04"
 	return targetTime.Format(customFormat)
 }

@@ -12,7 +12,14 @@ type msgMatcher interface {
 	IsMatch(msg string) bool
 }
 
-type MsgHandler func(msg string) string
+// MsgReply 定义消息回复的结构
+type MsgReply struct {
+	Type    string // "text" 或 "image"
+	Content string // 文本内容或图片URL
+}
+
+// MsgHandler 修改函数签名
+type MsgHandler func(msg string) MsgReply
 
 type SimpleMsgMatcher struct {
 	command string
@@ -35,18 +42,18 @@ func RegisterMsgHandler(matcher msgMatcher, handler MsgHandler) {
 	handlerMap[matcher] = handler
 }
 
-func HandleTextMsg(in string, replyFunc func(reply string)) {
+func HandleTextMsg(in string, replyFunc func(reply MsgReply)) {
 	matchTimes := 0
 	for matcher, handler := range handlerMap {
 		if matcher.IsMatch(in) {
 			matchTimes++
-			str := handler(in)
-			if str != "" {
-				replyFunc(str)
+			reply := handler(in)
+			if reply.Content != "" {
+				replyFunc(reply)
 			}
 		}
 	}
 	if matchTimes == 0 {
-		replyFunc("听不懂思密达 😅")
+		replyFunc(MsgReply{Type: "text", Content: "听不懂思密达 😅"})
 	}
 }
